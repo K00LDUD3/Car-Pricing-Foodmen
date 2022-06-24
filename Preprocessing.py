@@ -56,7 +56,11 @@ def ReadTrainData(filename, raw=False) -> p.DataFrame:
     if raw:
         return df
 
-    #OUTLIERS - Pattern breakers/ Exceptions
+    #Removing INDEX column
+    #df.drop('index', inplace=True, axis=1)
+
+
+    # OUTLIERS - Pattern breakers/ Exceptions
     def FindOutliersLim(column_name, df):
         q1 = np.percentile(df[column_name], 25) #1st quartile - 25%
         q3 = np.percentile(df[column_name], 75) #3rd quartile - 75%
@@ -108,6 +112,7 @@ def ReadTrainData(filename, raw=False) -> p.DataFrame:
     #Log Transforming Price to increase relation with other columns 
     #Makes it easier to find a pattern
     final_data['price_log_transform'] = np.log(final_data['Price'])
+
 
 
     return final_data
