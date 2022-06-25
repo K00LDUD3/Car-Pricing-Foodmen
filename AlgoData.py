@@ -1,4 +1,4 @@
-import pandas as p
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as s
@@ -20,13 +20,18 @@ from sklearn.preprocessing import OrdinalEncoder
 from scipy.stats import shapiro
 
 plt.rcParams['figure.figsize'] = [15,8]
-def ReadTrainData(filename, raw=False) -> p.DataFrame:
+def ReadTrainData(filename, raw=False, price_log = False) -> pd.DataFrame:
     #Reading the data
-    df = p.read_csv(filepath_or_buffer=filename)
-    df.drop('ID', axis=1, inplace=True)
+    df = pd.read_csv(filepath_or_buffer=filename)
     
+    ##MANUFACTURER redundancies
+    manuf_count = pd.DataFrame(df.Manufacturer.value_counts())
+    manuf_count = manuf_count[manuf_count['Manufacturer'].isin([i for i in range(0,10)])]
+    df = df[~df['Manufacturer'].isin(manuf_count.index)]
+    print(df.shape)
+
     ##MILEAGE
-    df.Mileage = p.to_numeric(df.Mileage.apply(lambda x: float(str(x).split(' ')[0])))
+    df.Mileage = pd.to_numeric(df.Mileage.apply(lambda x: float(str(x).split(' ')[0])))
 
     ##LEVY
     #Replacing hyphens with 0s
@@ -34,7 +39,7 @@ def ReadTrainData(filename, raw=False) -> p.DataFrame:
         if n == '-':
             return 0.0
         return float(n)
-    df.Levy = p.to_numeric(df.Levy.apply(lambda x: replaceHyphen(x)))
+    df.Levy = pd.to_numeric(df.Levy.apply(lambda x: replaceHyphen(x)))
     
     #ENGINE VOLUME
     #Getting raw number
@@ -85,10 +90,10 @@ def ReadTrainData(filename, raw=False) -> p.DataFrame:
     #Creating Intervals aka BIN variables 
     #Alternative to scaling down data
     mileage_intervals = [i for i in range(0,10)]
-    df['Mileage_BIN'] = p.cut(df['Mileage'], len(mileage_intervals), labels=mileage_intervals)
+    df['Mileage_BIN'] = pd.cut(df['Mileage'], len(mileage_intervals), labels=mileage_intervals)
     df['Mileage_BIN'] = df['Mileage_BIN'].astype(float)
     engineVol_intervals = [i for i in range(0,5)]
-    df['EngineVolume_BIN'] = p.cut(df['Engine volume'], len(engineVol_intervals), labels=engineVol_intervals)
+    df['EngineVolume_BIN'] = pd.cut(df['Engine volume'], len(engineVol_intervals), labels=engineVol_intervals)
     df['EngineVolume_BIN'] = df['EngineVolume_BIN'].astype(float)
 
 
@@ -107,11 +112,11 @@ def ReadTrainData(filename, raw=False) -> p.DataFrame:
     numeric_data.reset_index(inplace=True)
     categ_ordinal_encoded.reset_index(inplace=True)
     categ_ordinal_encoded.drop('index', axis=1, inplace=True)
-    final_data = p.concat([numeric_data, categ_ordinal_encoded], axis=1)
+    final_data = pd.concat([numeric_data, categ_ordinal_encoded], axis=1)
 
     #Log Transforming Price to increase relation with other columns 
     #Makes it easier to find a pattern
-    final_data['price_log_transform'] = np.log(final_data['Price'])
+    final_data['Price'] = np.log(final_data['Price'])
 
     return final_data
 
