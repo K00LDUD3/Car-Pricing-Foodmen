@@ -113,6 +113,12 @@ def ReadTrainData(filename, raw=False) -> p.DataFrame:
     #Makes it easier to find a pattern
     final_data['price_log_transform'] = np.log(final_data['Price'])
 
-
-
     return final_data
+
+
+
+def ReadModel(filename):
+    f = open(filename, 'rb')
+    model = pickle.load(f)
+    f.close()
+    return model
