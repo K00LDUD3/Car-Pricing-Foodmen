@@ -24,6 +24,9 @@ def ReadTrainData(filename, raw=False, price_log = False) -> pd.DataFrame:
     #Reading the data
     df = pd.read_csv(filepath_or_buffer=filename)
     
+    ##PRICE has high variance so it will be reduced to 100 - 100k $
+    df = df.drop(df[(df['Price'] > 100000) | (df['Price'] < 100)].index)
+    
     ##MANUFACTURER redundancies
     manuf_count = pd.DataFrame(df.Manufacturer.value_counts())
     manuf_count = manuf_count[manuf_count['Manufacturer'].isin([i for i in range(0,10)])]
@@ -64,6 +67,13 @@ def ReadTrainData(filename, raw=False, price_log = False) -> pd.DataFrame:
     #Removing INDEX column
     #df.drop('index', inplace=True, axis=1)
 
+    ##LEATHER INTERIOR replacing yes or no with 1 and 0
+    def YNReplace(n):
+        n = str(n).strip().lower()
+        if n == 'yes':
+            return 1
+        return 0
+    df['Leather interior'] = df['Leather interior'].apply(lambda x: YNReplace(x))
 
     # OUTLIERS - Pattern breakers/ Exceptions
     def FindOutliersLim(column_name, df):
@@ -105,7 +115,7 @@ def ReadTrainData(filename, raw=False, price_log = False) -> pd.DataFrame:
     encode.fit(categ_data[categ_col])
 
     categ_ordinal_encoded = encode.transform(categ_data[categ_col])
-    categ_ordinal_encoded = p.DataFrame(categ_ordinal_encoded, columns=categ_col)
+    categ_ordinal_encoded = pd.DataFrame(categ_ordinal_encoded, columns=categ_col)
     categ_data.reset_index(inplace=True)
     categ_ordinal_encoded.head()
 
@@ -118,6 +128,8 @@ def ReadTrainData(filename, raw=False, price_log = False) -> pd.DataFrame:
     #Makes it easier to find a pattern
     final_data['Price'] = np.log(final_data['Price'])
 
+    df.reset_index(inplace=True)
+    df.drop('Unnamed: 0', axis=1, inplace=True)
     return final_data
 
 
