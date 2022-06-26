@@ -119,6 +119,11 @@ def ReadTrainData(filename, raw=False, price_log = False) -> pd.DataFrame:
     categ_data.reset_index(inplace=True)
     categ_ordinal_encoded.head()
 
+    #Storing encoder for future reference
+    f = open('Encoder.bin', 'wb')
+    pickle.dump(encode, f)
+    f.close()
+
     numeric_data.reset_index(inplace=True)
     categ_ordinal_encoded.reset_index(inplace=True)
     categ_ordinal_encoded.drop('index', axis=1, inplace=True)
