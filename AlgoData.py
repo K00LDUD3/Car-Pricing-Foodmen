@@ -20,7 +20,7 @@ from sklearn.preprocessing import OrdinalEncoder
 from scipy.stats import shapiro
 
 plt.rcParams['figure.figsize'] = [15,8]
-def ReadTrainData(filename, raw=False, price_log = False) -> pd.DataFrame:
+def ReadTrainData(filename, raw=False, encode = True) -> pd.DataFrame:
     #Reading the data
     df = pd.read_csv(filepath_or_buffer=filename)
     
@@ -107,6 +107,9 @@ def ReadTrainData(filename, raw=False, price_log = False) -> pd.DataFrame:
     df['EngineVolume_BIN'] = df['EngineVolume_BIN'].astype(float)
 
 
+    if not encode:
+        return df
+    
     #Ordinal Encoding Categorical Variables
     numeric_data = df.select_dtypes(include=np.number)
     categ_data = df.select_dtypes(include='object')
@@ -114,6 +117,11 @@ def ReadTrainData(filename, raw=False, price_log = False) -> pd.DataFrame:
     categ_col = categ_data.columns.tolist()
     encode.fit(categ_data[categ_col])
 
+    '''
+    Categorical Columns
+    ['Manufacturer', 'Model', 'Category', 'Fuel type', 'Gear box type', 'Drive wheels', 'Doors', 'Wheel', 'Color']
+    '''
+    
     categ_ordinal_encoded = encode.transform(categ_data[categ_col])
     categ_ordinal_encoded = pd.DataFrame(categ_ordinal_encoded, columns=categ_col)
     categ_data.reset_index(inplace=True)
@@ -135,9 +143,9 @@ def ReadTrainData(filename, raw=False, price_log = False) -> pd.DataFrame:
 
     df.reset_index(inplace=True)
     df.drop('Unnamed: 0', axis=1, inplace=True)
-    return final_data, categ_col
+    return final_data
 
-
+ReadTrainData('train_final.csv', raw=False)
 
 def ReadModel(filename):
     f = open(filename, 'rb')
