@@ -135,7 +135,7 @@ def ReadTrainData(filename, raw=False, price_log = False) -> pd.DataFrame:
 
     df.reset_index(inplace=True)
     #df.drop('Unnamed: 0', axis=1, inplace=True)
-    return final_data
+    return final_data, categ_data.columns
 
 
 
