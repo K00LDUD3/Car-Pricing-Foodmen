@@ -1,7 +1,5 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as s
 import pickle
 
 import warnings
@@ -12,7 +10,6 @@ import datetime as dt
 from sklearn.preprocessing import OrdinalEncoder
 from scipy.stats import shapiro
 
-plt.rcParams['figure.figsize'] = [15,8]
 def ReadTrainData(filename, raw=False, encode = True) -> pd.DataFrame:
     #Reading the data
     df = pd.read_csv(filepath_or_buffer=filename)
@@ -95,9 +92,6 @@ def ReadTrainData(filename, raw=False, encode = True) -> pd.DataFrame:
     mileage_intervals = [i for i in range(0,10)]
     df['Mileage_BIN'] = pd.cut(df['Mileage'], len(mileage_intervals), labels=mileage_intervals)
     df['Mileage_BIN'] = df['Mileage_BIN'].astype(float)
-    engineVol_intervals = [i for i in range(0,5)]
-    df['EngineVolume_BIN'] = pd.cut(df['Engine volume'], len(engineVol_intervals), labels=engineVol_intervals)
-    df['EngineVolume_BIN'] = df['EngineVolume_BIN'].astype(float)
 
 
     if not encode:
@@ -138,10 +132,13 @@ def ReadTrainData(filename, raw=False, encode = True) -> pd.DataFrame:
     df.drop('Unnamed: 0', axis=1, inplace=True)
     return final_data
 
-ReadTrainData('train_final.csv', raw=False)
 
-def ReadModel(filename):
-    f = open(filename, 'rb')
-    model = pickle.load(f)
-    f.close()
-    return model
+def GetBINVal(val):
+    val = float(val)
+    df_mileage = pd.read_csv('TrainData_Processed.csv', index_col=[0])['Mileage']
+    df_mileage = pd.concat([df_mileage, pd.Series(val)], ignore_index=True)
+    df_mileage = df_mileage.to_frame(name='Vals')
+    mileage_intervals = [i for i in range(0,10)]
+    df_mileage['Mileage_BIN'] = pd.cut(df_mileage['Vals'], len(mileage_intervals), labels=mileage_intervals)
+    df_mileage['Mileage_BIN'] = df_mileage['Mileage_BIN'].astype(float)
+    return float(df_mileage.tail(1)['Mileage_BIN'])
