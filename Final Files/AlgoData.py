@@ -12,7 +12,7 @@ from scipy.stats import shapiro
 
 def ReadTrainData(filename, raw=False, encode = True) -> pd.DataFrame:
     #Reading the data
-    df = pd.read_csv(filepath_or_buffer=filename)
+    df = pd.read_csv(filepath_or_buffer=filename).drop('Doors', axis=1)
     
     ##PRICE has high variance so it will be reduced to 100 - 100k $
     df = df.drop(df[(df['Price'] > 100000) | (df['Price'] < 100)].index)
@@ -106,7 +106,7 @@ def ReadTrainData(filename, raw=False, encode = True) -> pd.DataFrame:
 
     '''
     Categorical Columns
-    ['Manufacturer', 'Model', 'Category', 'Fuel type', 'Gear box type', 'Drive wheels', 'Doors', 'Wheel', 'Color']
+    ['Manufacturer', 'Model', 'Category', 'Fuel type', 'Gear box type', 'Drive wheels', 'Wheel', 'Color']
     '''
     
     categ_ordinal_encoded = encode.transform(categ_data[categ_col])
