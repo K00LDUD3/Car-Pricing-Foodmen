@@ -7,3 +7,5 @@
 # beta RF final 0.0.4 Log corrected with expensive cars eliminated
 
 # beta RF final 0.0.6 eliminated 'INDEX' column [0.8 GB]
+
+# RF final 1.0.1 eliminated 'ENGINE VOL BIN' column (No effect observed) [0.8 GB]
