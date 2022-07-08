@@ -17,6 +17,25 @@ def ReadTrainData(filename, raw=False, encode = True) -> pd.DataFrame:
     ##PRICE has high variance so it will be reduced to 100 - 100k $
     df = df.drop(df[(df['Price'] > 100000) | (df['Price'] < 100)].index)
     
+    #Making everything lower case
+    df['Manufacturer'] = df['Manufacturer'].apply(lambda x: x.lower())
+    df['Model'] = df['Model'].apply(lambda x: x.lower())
+    df['Category'] = df['Category'].apply(lambda x: x.lower())
+    df['Fuel type'] = df['Fuel type'].apply(lambda x: x.lower())
+    df['Gear box type'] = df['Gear box type'].apply(lambda x: x.lower())
+    df['Wheel'] = df['Wheel'].apply(lambda x: x.lower())
+    df['Color'] = df['Color'].apply(lambda x: x.lower())
+    df['Color'] = df['Color'].apply(lambda x: x.lower())
+
+
+    #WHEEL cleaning up wheel column to make it say either left wheel or right wheel
+    def SplitWheel(n):
+        n = str(n)
+        return ''+n.split(' ')[0].split('-')[0]+' wheel'
+    df['Wheel'] = df['Wheel'].apply(lambda x: SplitWheel(x))
+    wheel_dummies = pd.get_dummies(df['Wheel'], drop_first = False)
+    df = pd.concat([df, wheel_dummies], axis=1)
+    
     ##MANUFACTURER redundancies
     manuf_count = pd.DataFrame(df.Manufacturer.value_counts())
     manuf_count = manuf_count[manuf_count['Manufacturer'].isin([i for i in range(0,10)])]
@@ -93,24 +112,7 @@ def ReadTrainData(filename, raw=False, encode = True) -> pd.DataFrame:
     df['Mileage_BIN'] = pd.cut(df['Mileage'], len(mileage_intervals), labels=mileage_intervals)
     df['Mileage_BIN'] = df['Mileage_BIN'].astype(float)
 
-    #Making everything lower case
-    df['Manufacturer'] = df['Manufacturer'].apply(lambda x: x.lower())
-    df['Model'] = df['Model'].apply(lambda x: x.lower())
-    df['Category'] = df['Category'].apply(lambda x: x.lower())
-    df['Fuel type'] = df['Fuel type'].apply(lambda x: x.lower())
-    df['Gear box type'] = df['Gear box type'].apply(lambda x: x.lower())
-    df['Wheel'] = df['Wheel'].apply(lambda x: x.lower())
-    df['Color'] = df['Color'].apply(lambda x: x.lower())
-    df['Color'] = df['Color'].apply(lambda x: x.lower())
-
-
-    #WHEEL cleaning up wheel column to make it say either left wheel or right wheel
-    def SplitWheel(n):
-        n = str(n)
-        return ''+n.split(' ')[0].split('-')[0]+' wheel'
-    df['Wheel'] = df['Wheel'].apply(lambda x: SplitWheel(x))
-    wheel_dummies = pd.get_dummies(df['Wheel'], drop_first = False)
-    df = pd.concat([df, wheel_dummies], axis=1)
+    
 
 
     if not encode:
