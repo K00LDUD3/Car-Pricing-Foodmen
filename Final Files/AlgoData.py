@@ -204,3 +204,12 @@ def ArrangeInput(params):
     final_data = pd.concat([numeric_data, categ_var_enc], axis=1)
 
     return final_data
+
+#Getting a unique model for each manufacturer
+def ManufactUniqueModels() -> dict():
+    df = pd.read_csv('TrainData_Raw.csv', index_col=[0])
+    manufacturers = list(df.Manufacturer.unique())
+    manufacturers_unique_models = {}
+    for i in range(len(manufacturers)):
+        manufacturers_unique_models[manufacturers[i]] = df[df['Manufacturer'] == manufacturers[i]].Model.unique()
+    return (manufacturers_unique_models, manufacturers)
