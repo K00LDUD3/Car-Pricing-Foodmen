@@ -163,3 +163,44 @@ def GetBINVal(val):
     df_mileage['Mileage_BIN'] = pd.cut(df_mileage['Vals'], len(mileage_intervals), labels=mileage_intervals)
     df_mileage['Mileage_BIN'] = df_mileage['Mileage_BIN'].astype(float)
     return float(df_mileage.tail(1)['Mileage_BIN'])
+
+def ArrangeInput(params):
+    inp = [params['levy'],
+           params['prod_year'],     
+           params['leather'], 
+           params['levy'],
+           params['engine_vol'],
+           params['mileage'],
+           params['cylinders'],
+           params['airbags'],
+           params['turbo'],
+           GetBINVal(params['mileage']),
+           params['left'],
+           params['right'],
+           #String Parameters (to be encoded)
+           params['manufacturer'],
+           params['model'],
+           params['category'],
+           params['fuel_type'],
+           params['gear_box_type'],
+           params['drive_wheels'],
+           params['color']
+    ]
+    
+
+    
+    categ_col = ['Manufacturer', 'Model', 'Category', 'Fuel type', 'Gear box type', 'Drive wheels', 'Color']
+    categ_var = inp[len(inp) - 7 ::]
+    categ_data = pd.DataFrame(categ_var, index=categ_col).T
+    f = open('Encoder.bin', 'rb')
+    encoder = pickle.load(f)
+    f.close()
+    categ_var_enc = pd.DataFrame(encoder.transform(categ_data), columns=categ_col)
+    
+    
+    numeric_col = ['Levy', 'Prod. year', 'Leather interior', 'Engine volume', 'Mileage', 'Cylinders', 'Airbags', 'Turbo', 'Mileage_BIN', 'left wheel', 'right wheel']
+    numeric_data = pd.DataFrame(inp[:11], index=numeric_col).T
+
+    final_data = pd.concat([numeric_data, categ_var_enc], axis=1)
+
+    return final_data
