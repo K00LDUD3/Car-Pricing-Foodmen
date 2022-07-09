@@ -1,3 +1,4 @@
+from msilib.schema import CreateFolder
 import pandas as pd
 import numpy as np
 import pickle
@@ -9,6 +10,8 @@ import datetime as dt
 
 from sklearn.preprocessing import OrdinalEncoder
 from scipy.stats import shapiro
+
+df_raw = pd.read_csv('TrainData_Raw.csv')
 
 def ReadTrainData(filename, raw=False, encode = True) -> pd.DataFrame:
     #Reading the data
@@ -164,6 +167,7 @@ def GetBINVal(val):
     df_mileage['Mileage_BIN'] = df_mileage['Mileage_BIN'].astype(float)
     return float(df_mileage.tail(1)['Mileage_BIN'])
 
+#Preparing input for feeding the model
 def ArrangeInput(params):
     inp = [params['levy'],
            params['prod_year'],     
@@ -206,10 +210,26 @@ def ArrangeInput(params):
     return final_data
 
 #Getting a unique model for each manufacturer
-def ManufactUniqueModels() -> dict():
-    df = pd.read_csv('TrainData_Raw.csv', index_col=[0])
-    manufacturers = list(df.Manufacturer.unique())
+def ManufactUniqueModels() -> tuple:
+    manufacturers = list(df_raw.Manufacturer.unique())
     manufacturers_unique_models = {}
     for i in range(len(manufacturers)):
-        manufacturers_unique_models[manufacturers[i]] = df[df['Manufacturer'] == manufacturers[i]].Model.unique()
+        manufacturers_unique_models[manufacturers[i]] = df_raw[df_raw['Manufacturer'] == manufacturers[i]].Model.unique()
     return (manufacturers_unique_models, manufacturers)
+
+#Getting unique category, fuel type, gear box type, drivewheels, color
+def CategValsUnique() -> dict:
+    category = list(df_raw['Category'].unique())
+    fuel_type = list(df_raw['Fuel type'].unique())
+    gear_box_type = list(df_raw['Gear box type'].unique())
+    drivewheels = list(df_raw['Drive wheels'].unique())
+    color = list(df_raw['Color'].unique())
+    
+    categ_dict = {
+        "category": category,
+        "fuel_type": fuel_type,
+        "gear_box_type": gear_box_type,
+        "drive_wheels": drivewheels,
+        "color": color
+    }
+    return categ_dict
