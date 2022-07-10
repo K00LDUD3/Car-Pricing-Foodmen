@@ -210,12 +210,15 @@ def ArrangeInput(params):
     return final_data
 
 #Getting a unique model for each manufacturer
-def ManufactUniqueModels() -> tuple:
-    manufacturers = list(df_raw.Manufacturer.unique())
-    manufacturers_unique_models = {}
-    for i in range(len(manufacturers)):
-        manufacturers_unique_models[manufacturers[i]] = df_raw[df_raw['Manufacturer'] == manufacturers[i]].Model.unique()
-    return (manufacturers_unique_models, manufacturers)
+def ManufactUniqueModels(choice = 'M') -> tuple:
+    if choice.upper() == 'M':
+        manufacturers = list(df_raw.Manufacturer.unique())
+        return manufacturers
+    else:
+        manufacturers_unique_models = {}
+        for i in range(len(manufacturers)):
+            manufacturers_unique_models[manufacturers[i]] = df_raw[df_raw['Manufacturer'] == manufacturers[i]].Model.unique()
+        return manufacturers_unique_models
 
 #Getting unique category, fuel type, gear box type, drivewheels, color
 def CategValsUnique() -> dict:

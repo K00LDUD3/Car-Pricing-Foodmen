@@ -5,6 +5,7 @@ from tkinter.ttk import *
 
 theme = 'xpnative'
 class GenFunc:
+    FONT = None
     widg = None
     text = ''
     wd = {} #Widget Dictionary
@@ -12,6 +13,7 @@ class GenFunc:
     #frame = None
     def __init__(self, type, widg_dict, text, grid_dict) -> None:
         #Assigning param variables to class variables
+        self.FONT = 11
         self.text = text
         self.wd = widg_dict
         self.gd = grid_dict
@@ -43,12 +45,12 @@ class GenFunc:
     def createB(self):
         s=ttk.Style(master=None)
         s.theme_use(theme)
+        s.configure(style=theme, font="Helvetica 10 bold")
         self.widg = Button(
             master= self.wd['master'],
             text=self.text,
             width=self.wd['w'],
             height=self.wd['height'],
-            font=self.wd['font'],
             highlightbackground=self.wd['highl_color'],
             background=self.wd['bg'],
             foreground=self.wd['fg'],
@@ -57,9 +59,11 @@ class GenFunc:
             pady=self.wd['pady'],
             wraplength=self.wd['wraplength'],
             relief=self.wd['relief'],
-            underline=self.wd['underline']
-
+            underline=self.wd['underline'],
+            style='small.TButton'
         )
+
+        s.configure('small.TButton', font=(None, self.FONT))
         self.widg.grid(
             column= self.gd['column'],
             row= self.gd['row'],
@@ -114,8 +118,10 @@ class GenFunc:
             relief=  self.wd['relief'],
             underline=  self.wd['underline'],
             width=  self.wd['w'],
-            wraplength=  self.wd['wraplength']
+            wraplength=  self.wd['wraplength'],
+            style='small.TButton'
         )
+        s.configure('small.TButton', font=(None, self.FONT))
         self.widg.grid(
             column= self.gd['column'],
             row= self.gd['row'],
@@ -166,8 +172,10 @@ class GenFunc:
             insertontime= self.wd['insertontime'],
             relief= self.wd['relief'],
             highlightthickness= self.wd['highthick'],
-            xscrollcommand= self.wd['xscrollcommand']
+            xscrollcommand= self.wd['xscrollcommand'],
+            style='small.TButton'
         )
+        s.configure('small.TButton', font=(None, self.FONT))
         self.widg.grid(
             column= self.gd['column'],
             row= self.gd['row'],

@@ -1,3 +1,4 @@
+from ctypes.wintypes import HGDIOBJ
 from tkinter import *
 from tkinter import ttk
 import tkinter.font as font
@@ -9,7 +10,25 @@ root = Tk()
 root.title('Used Car Pricing')
 
 #FRAMES
+sign_frame = LabelFrame(root)
+signIn_frame = LabelFrame(root)
+signUp_frame = LabelFrame(root)
 
+home_frame = LabelFrame(root)
+
+#CATEGORICAL input frames
+iManufacturer_frame = LabelFrame(root)
+iModel_frame = LabelFrame(root)
+iCategory_frame = LabelFrame(root)
+iFuelType_frame = LabelFrame(root)
+iGearBox_frame = LabelFrame(root)
+iDriveWheels_frame = LabelFrame(root)
+iColor_frame = LabelFrame(root)
+
+iLRWheel_frame = LabelFrame(root)
+
+#NUMERICAL input frames
+iNumericInp_frame = LabelFrame(root)
 
 #WIDGET DICTIONARIES (GLOBAL to access anytime)
 #Button features
@@ -33,7 +52,7 @@ button_dict = {
             'wraplength':None
         }
 #for label features
-lab_dict = {
+label_dict = {
             'master':None,
             'anchor':None,
             'bg':None,
@@ -106,7 +125,49 @@ def GetFreeCoor(arr):
     return (None, None, arr)
 
 
+def home(frame):
+    '''
+    Homescreen to display available options(sign out, start pricing)
+    '''
+    hideFrame(frame=frame)
+    h_gd = gd
+    h_bd = button_dict
+    h_gd['ipady'] = 5
+    h_bd['master'] = home_frame
+    h_bd['w'] = 20
+    
+    placements = [[0,],
+                  [0,]]
 
+    h_gd['row'], h_gd['column'], placements = GetFreeCoor(placements)
+    start_b = gf.GenFunc('button', h_bd, 'Start', h_gd)
 
+    h_gd['row'], h_gd['column'], placements = GetFreeCoor(placements)
+    back_b = gf.GenFunc('button', h_bd, 'Sign Out', h_gd)
 
+    home_frame.pack()
+    return
+
+#ALL FRAMES for taking CATEGORICAL input
+def iManufacturer(frame):
+    hideFrame(frame=frame)
+
+    im_bd = button_dict
+    im_ld = label_dict
+    im_bd['master'] = iManufacturer_frame
+    im_ld['master'] = iManufacturer_frame
+    im_gd = gd
+
+    placements = [[0,0],
+                  [0,0]
+                  [0,0]]
+
+    #0,1
+    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
+    input_l = gf.GenFunc('label', im_ld, 'Manufacturer:', im_ld)
+
+    #1,1
+    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
+
+home(frame=None)
 root.mainloop()
