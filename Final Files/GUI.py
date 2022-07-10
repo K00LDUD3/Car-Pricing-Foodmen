@@ -34,6 +34,7 @@ iNumericInp_frame = LabelFrame(root)
 
 #CLASS VARIABLES require
 current_manufacturer = 'lexus' #First value is lexus
+categorical_cols = alg.CategValsUnique() #CATEGORICAL options
 
 #WIDGET DICTIONARIES (GLOBAL to access anytime)
 #Button features
@@ -156,6 +157,7 @@ def home(frame):
 
 # Changing current manufacturer to extract the models available
 def UpdateManufacturer(choice):
+    global current_manufacturer
     choice = choice.strip().split(' ')[1]
     current_manufacturer = choice
     print(current_manufacturer)
@@ -184,6 +186,8 @@ def iManufacturer(frame):
 
     #0,1
     im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
+    global current_manufacturer
+    current_manufacturer = 'lexus'
     manufacturer_list = alg.ManufactUniqueModels(choice='m')
     manufacturer_list = ['   '+(str(i+1)+'. '+manufacturer_list[i]) for i in range(len(manufacturer_list))]
     s=ttk.Style(master=None)
@@ -204,7 +208,8 @@ def iManufacturer(frame):
     #2,0
     im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
     cancel_b =  gf.GenFunc('button', im_bd, 'Cancel', im_gd)
-
+    cancel_b.widg.config(command= lambda: home(frame=iManufacturer))
+    
     #2,1
     im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', im_bd, 'Next', im_gd)
@@ -230,10 +235,12 @@ def iModel(frame):
 
     #0,1
     im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
-    models_list = alg.ManufactUniqueModels(choice='mm')[current_manufacturer]
+    models_dict = alg.ManufactUniqueModels(choice='mm')
+    global current_manufacturer
+    models_list = models_dict.get(current_manufacturer)
     s=ttk.Style(master=None)
     s.theme_use('xpnative')
-    combo = ttk.Combobox(master=iModel_frame, values=models_list, state='readonly')
+    combo = ttk.Combobox(master=iModel_frame, values=list(models_list), state='readonly')
     s.configure('small.TButton', font=(None, 11))
     combo.grid(row=im_gd['row'], column=im_gd['column'])
     combo.current(0)
@@ -247,13 +254,59 @@ def iModel(frame):
     
     #2,0
     im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
-    back_b =  gf.GenFunc('button', im_bd, 'Cancel', im_gd)
-
+    back_b =  gf.GenFunc('button', im_bd, 'Back', im_gd)
+    back_b.widg.config(command=lambda: iManufacturer(frame=iModel_frame))
+    
     #2,1
     im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', im_bd, 'Next', im_gd)
-
+    go_b.widg.config(command= lambda: iCategory(frame=iModel_frame))
     iModel_frame.pack()
 
+def iCategory(frame):
+    hideFrame(frame=frame)
+
+    ic_bd = button_dict
+    ic_ld = label_dict
+    ic_bd['master'] = iCategory_frame
+    ic_ld['master'] = iCategory_frame
+    ic_gd = gd
+
+    placements = [[0,0],
+                  [0,0],
+                  [0,0]]
+    
+    #0,0
+    ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
+    input_l = gf.GenFunc('label', ic_ld, 'Model:', ic_gd)
+
+    #0,1
+    ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
+    categories_list = categorical_cols['category']
+    s=ttk.Style(master=None)
+    s.theme_use('xpnative')
+    combo = ttk.Combobox(master=iCategory_frame, values=list(categories_list), state='readonly')
+    s.configure('small.TButton', font=(None, 11))
+    combo.grid(row=ic_gd['row'], column=ic_gd['column'])
+    combo.current(0)
+
+    #1,0
+    ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
+    ic_gd['cspan'] = 2
+    msg_l = gf.GenFunc('label', ic_ld, 'OUTPUT', ic_gd)
+    ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
+    ic_gd['cspan'] = 1
+
+    #2,0
+    ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
+    back_b =  gf.GenFunc('button', ic_bd, 'Back', ic_gd)
+    back_b.widg.config(command= lambda: iModel(frame=iCategory_frame))
+
+    #2,1
+    ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
+    go_b = gf.GenFunc('button', ic_bd, 'Next', ic_gd)
+
+    iCategory_frame.pack()
+    
 home(frame=None)
 root.mainloop()
