@@ -2,6 +2,7 @@ from tkinter import *
 import tkinter.font as font
 from tkinter import ttk
 from tkinter.ttk import *
+import tkinter as tk
 
 theme = 'xpnative'
 class GenFunc:
@@ -101,7 +102,7 @@ class GenFunc:
     def createL(self):
         s=ttk.Style(master=None)
         s.theme_use(theme)
-        self.widg = Label(
+        self.widg = tk.Label(
             master= self.wd['master'],
             text=  self.text,
             anchor=  self.wd['anchor'],
@@ -109,7 +110,6 @@ class GenFunc:
             foreground=  self.wd['fg'],
             bitmap=  self.wd['bitmap'],
             bd=  self.wd['bd'],
-            font=  self.wd['font'],
             height=  self.wd['height'],
             image=  self.wd['image'],
             justify=  self.wd['justify'],
@@ -119,9 +119,10 @@ class GenFunc:
             underline=  self.wd['underline'],
             width=  self.wd['w'],
             wraplength=  self.wd['wraplength'],
-            style='small.TButton'
+            #style='small.TButton'
+            font=(None, 11)
         )
-        s.configure('small.TButton', font=(None, self.FONT))
+        s.configure('xpnative', font=(None, self.FONT))
         self.widg.grid(
             column= self.gd['column'],
             row= self.gd['row'],

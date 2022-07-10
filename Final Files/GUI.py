@@ -4,6 +4,7 @@ from tkinter import ttk
 import tkinter.font as font
 
 import GenFunctions as gf
+import AlgoData as alg
 
 #Creating window
 root = Tk()
@@ -136,11 +137,12 @@ def home(frame):
     h_bd['master'] = home_frame
     h_bd['w'] = 20
     
-    placements = [[0,],
-                  [0,]]
+    placements = [[0],
+                  [0]]
 
     h_gd['row'], h_gd['column'], placements = GetFreeCoor(placements)
     start_b = gf.GenFunc('button', h_bd, 'Start', h_gd)
+    start_b.widg.config(command= lambda: iManufacturer(frame=home_frame))
 
     h_gd['row'], h_gd['column'], placements = GetFreeCoor(placements)
     back_b = gf.GenFunc('button', h_bd, 'Sign Out', h_gd)
@@ -159,15 +161,40 @@ def iManufacturer(frame):
     im_gd = gd
 
     placements = [[0,0],
-                  [0,0]
+                  [0,0],
                   [0,0]]
+
+    #0,0
+    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
+    input_l = gf.GenFunc('label', im_ld, 'Manufacturer:', im_gd)
 
     #0,1
     im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
-    input_l = gf.GenFunc('label', im_ld, 'Manufacturer:', im_ld)
+    manufacturer_list = alg.ManufactUniqueModels(choice='m')
+    manufacturer_list = ['   '+(str(i+1)+'. '+manufacturer_list[i]) for i in range(len(manufacturer_list))]
+    s=ttk.Style(master=None)
+    s.theme_use('xpnative')
+    combo = ttk.Combobox(master=iManufacturer_frame, values=manufacturer_list, state='readonly', width=20, style='small.TButton')
+    s.configure('small.TButton', font=(None, 11))
+    combo.grid(row=im_gd['row'], column=im_gd['column'])
+    combo.current(0)
 
-    #1,1
+    #1,0
     im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
+    im_gd['cspan'] = 2
+    msg_l = gf.GenFunc('label', im_ld, 'OUTPUT', im_gd)
+    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
+    im_gd['cspan'] = 1
 
+    #2,0
+    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
+    cancel_b =  gf.GenFunc('button', im_bd, 'Cancel', im_gd)
+
+    #2,1
+    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
+    go_b = gf.GenFunc('button', im_bd, 'Next', im_gd)
+
+    iManufacturer_frame.pack()
+    
 home(frame=None)
 root.mainloop()
