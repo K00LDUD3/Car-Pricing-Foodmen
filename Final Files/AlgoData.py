@@ -211,8 +211,8 @@ def ArrangeInput(params):
 
 #Getting a unique model for each manufacturer
 def ManufactUniqueModels(choice = 'M') -> tuple:
+    manufacturers = list(df_raw.Manufacturer.unique())
     if choice.upper() == 'M':
-        manufacturers = list(df_raw.Manufacturer.unique())
         return manufacturers
     else:
         manufacturers_unique_models = {}

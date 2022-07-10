@@ -1,6 +1,7 @@
 from ctypes.wintypes import HGDIOBJ
 from tkinter import *
 from tkinter import ttk
+import tkinter
 import tkinter.font as font
 
 import GenFunctions as gf
@@ -30,6 +31,9 @@ iLRWheel_frame = LabelFrame(root)
 
 #NUMERICAL input frames
 iNumericInp_frame = LabelFrame(root)
+
+#CLASS VARIABLES require
+current_manufacturer = 'lexus' #First value is lexus
 
 #WIDGET DICTIONARIES (GLOBAL to access anytime)
 #Button features
@@ -150,8 +154,18 @@ def home(frame):
     home_frame.pack()
     return
 
+# Changing current manufacturer to extract the models available
+def UpdateManufacturer(choice):
+    choice = choice.strip().split(' ')[1]
+    current_manufacturer = choice
+    print(current_manufacturer)
+    return
+
 #ALL FRAMES for taking CATEGORICAL input
 def iManufacturer(frame):
+    '''
+    FRAME for taking manufacturer as input
+    '''
     hideFrame(frame=frame)
 
     im_bd = button_dict
@@ -175,6 +189,7 @@ def iManufacturer(frame):
     s=ttk.Style(master=None)
     s.theme_use('xpnative')
     combo = ttk.Combobox(master=iManufacturer_frame, values=manufacturer_list, state='readonly', width=20, style='small.TButton')
+    combo.bind('<<ComboboxSelected>>', lambda x: UpdateManufacturer(combo.get()))
     s.configure('small.TButton', font=(None, 11))
     combo.grid(row=im_gd['row'], column=im_gd['column'])
     combo.current(0)
@@ -193,8 +208,52 @@ def iManufacturer(frame):
     #2,1
     im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', im_bd, 'Next', im_gd)
-
+    go_b.widg.config(command= lambda: iModel(frame=iManufacturer_frame))
     iManufacturer_frame.pack()
+
+def iModel(frame):
+    hideFrame(frame=frame)
+
+    im_bd = button_dict
+    im_ld = label_dict
+    im_bd['master'] = iModel_frame
+    im_ld['master'] = iModel_frame
+    im_gd = gd
     
+    placements = [[0,0],
+                  [0,0],
+                  [0,0]]
+
+    #0,0
+    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
+    input_l = gf.GenFunc('label', im_ld, 'Model:', im_gd)
+
+    #0,1
+    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
+    models_list = alg.ManufactUniqueModels(choice='mm')[current_manufacturer]
+    s=ttk.Style(master=None)
+    s.theme_use('xpnative')
+    combo = ttk.Combobox(master=iModel_frame, values=models_list, state='readonly')
+    s.configure('small.TButton', font=(None, 11))
+    combo.grid(row=im_gd['row'], column=im_gd['column'])
+    combo.current(0)
+    
+    #1,0
+    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
+    im_gd['cspan'] = 2
+    msg_l = gf.GenFunc('label', im_ld, 'OUTPUT', im_gd)
+    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
+    im_gd['cspan'] = 1
+    
+    #2,0
+    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
+    back_b =  gf.GenFunc('button', im_bd, 'Cancel', im_gd)
+
+    #2,1
+    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
+    go_b = gf.GenFunc('button', im_bd, 'Next', im_gd)
+
+    iModel_frame.pack()
+
 home(frame=None)
 root.mainloop()
