@@ -27,19 +27,23 @@ iGearBox_frame = LabelFrame(root)
 iDriveWheels_frame = LabelFrame(root)
 iColor_frame = LabelFrame(root)
 
-iLRWheel_frame = LabelFrame(root)
-
 #NUMERICAL input frames
 iNumericInp_frame = LabelFrame(root)
 
-#CLASS VARIABLES require
-current_manufacturer = 'lexus' #First value is lexus
-current_model = '' 
-current_category = ''
-current_gearbox = ''
-current_fueltype = ''
-current_drivewheels = ''
-current_color = ''
+#CLASS VARIABLES required
+c_manufacturer = 'lexus' #First value is lexus
+c_model = '' 
+c_category = ''
+c_gearbox = ''
+c_fueltype = ''
+c_drivewheels = ''
+c_color = ''
+
+c_leather = 0
+c_turbo = 0
+c_year = 0
+c_wheelSide = ''
+
 categorical_cols = alg.CategValsUnique() #CATEGORICAL options
 
 #WIDGET DICTIONARIES (GLOBAL to access anytime)
@@ -163,9 +167,9 @@ def home(frame):
 
 
 def UpdateManufacturer(choice):
-    global current_manufacturer
+    global c_manufacturer
     choice = choice.strip().split(' ')[1]
-    current_manufacturer = choice
+    c_manufacturer = choice
     return
 
 #ALL FRAMES for taking CATEGORICAL input (Chronological)
@@ -221,10 +225,10 @@ def iManufacturer(frame):
     iManufacturer_frame.pack()
 
 def UpdateModel(choice):
-    global current_model
+    global c_model
     choice = choice.strip()
     choice = choice[choice.index(' ')+1::]
-    current_model = choice
+    c_model = choice
     return
 
 def iModel(frame):
@@ -250,8 +254,8 @@ def iModel(frame):
     #0,1
     im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
     models_dict = alg.ManufactUniqueModels(choice='mm')
-    global current_manufacturer
-    models_list = models_dict.get(current_manufacturer)
+    global c_manufacturer
+    models_list = models_dict.get(c_manufacturer)
     models_list = ['   '+(str(i+1)+'. '+models_list[i]) for i in range(len(models_list))]
     s=ttk.Style(master=None)
     
@@ -281,8 +285,8 @@ def iModel(frame):
     iModel_frame.pack()
 
 def UpdateCategory(choice):
-    global current_category
-    current_category = choice.strip()
+    global c_category
+    c_category = choice.strip()
 def iCategory(frame):
     '''
     FRAME for taking category as input
@@ -305,8 +309,8 @@ def iCategory(frame):
 
     #0,1
     ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
-    global current_model
-    category_list = alg.FetchModelsCateg(model=current_model)
+    global c_model
+    category_list = alg.FetchModelsCateg(model=c_model)
     UpdateCategory(choice=category_list[0])
     s=ttk.Style(master=None)
     combo = ttk.Combobox(master=iCategory_frame, values=list(category_list), state='readonly')
@@ -336,8 +340,8 @@ def iCategory(frame):
     return
 
 def UpdateFuelType(choice):
-    global current_fueltype
-    current_fueltype = choice.strip()
+    global c_fueltype
+    c_fueltype = choice.strip()
     return
 
 def iFuelType(frame):
@@ -391,8 +395,8 @@ def iFuelType(frame):
     iFuelType_frame.pack()
 
 def UpdateGearboxType(choice):
-    global current_gearbox
-    current_gearbox = choice.strip()
+    global c_gearbox
+    c_gearbox = choice.strip()
     return
 
 def iGearBox(frame):
@@ -447,8 +451,8 @@ def iGearBox(frame):
     return
 
 def UpdateDriveWheels(choice):
-    global current_drivewheels
-    current_drivewheels = choice.strip()
+    global c_drivewheels
+    c_drivewheels = choice.strip()
 def iDriveWheels(frame):
     '''
     FRAME for taking drive wheels as input
@@ -501,8 +505,8 @@ def iDriveWheels(frame):
     return
 
 def UpdateColor(choice):
-    global current_color
-    current_color = choice.strip()
+    global c_color
+    c_color = choice.strip()
     return
 
 def iColor(frame):
@@ -552,11 +556,27 @@ def iColor(frame):
     #2,1
     ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', ic_bd, 'Next', ic_gd)
-    #go_b.widg.config(command=lambda: )
+    go_b.widg.config(command=lambda: iNumericalInput(frame=iColor_frame))
 
     iColor_frame.pack()
     return
 
+def UpdateNumericInput(turbo, wheel_side, leather):
+    global c_wheelSide
+    global c_turbo
+    global c_leather
+    if turbo.lower() == 'yes':
+        c_turbo = 1
+    else:
+        c_turbo = 0
+
+    if leather.lower() == 'yes':
+        c_leather = 1
+    else:
+        c_leather = 0
+
+    c_wheelSide = wheel_side.lower()
+    print('UPDATE')
 #ALL FRAMES for taking CATEGORICAL input (Chronological)
 def iNumericalInput(frame):
     '''
@@ -578,5 +598,92 @@ def iNumericalInput(frame):
                   [0,0],
                   [0,0],
                   [0,0]]
-home(frame=None)
+
+    # 0,0
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    manufacPrompt_l = gf.GenFunc('label', in_ld, 'Manufacture Year: ', in_gd)
+
+    # 0,1
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    in_ed['width'] = 10
+    s=ttk.Style(master=None)
+    s.theme_use('xpnative')
+    def CheckYear(var, i, mode):
+        val = string.get()
+        msg_l.widg.config(text='')
+        if val.isnumeric() and '.' not in val:
+            if int(val) in range(1950,2021):
+                global c_year
+                c_year = int(val)
+                msg_l.widg.config(text='Valid Year')
+                return
+            else:
+                msg_l.widg.config(text='Out of range')
+                return
+        elif val == '':
+            msg_l.widg.config(text='Year must be 1950 - 2020')
+        return
+    string = StringVar()
+    string.trace_add('write', CheckYear)
+    manufac_e = gf.GenFunc('entry', in_ed, '', in_gd)
+    manufac_e.widg.config(textvariable=string)
+    
+    # 1,0
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    in_gd['cspan'] = 2
+    msg_l = gf.GenFunc('label', in_ld, 'Year must be 1950 - 2020', in_gd)
+    in_gd['cspan'] = 1
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+
+    # 2,0
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    turboPrompt_l = gf.GenFunc('label', in_ld, 'Turbo: ', in_gd)
+
+    # 2,1
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    s=ttk.Style(master=None)
+    combo_turbo = ttk.Combobox(master=iNumericInp_frame, values=['Yes','No'], state='readonly', width=in_ed['width']-3)
+    combo_turbo.bind('<<ComboboxSelected>>', lambda x: UpdateNumericInput(combo_turbo.get(), combo_wheel.get(), combo_leather.get()))
+    s.configure('small.TButton', font=(None, 11))
+    combo_turbo.grid(row=in_gd['row'], column=in_gd['column'])
+    combo_turbo.current(0)
+
+    # 3,0
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    leatherPrompt_l = gf.GenFunc('label', in_ld, 'Leather Interior: ', in_gd)
+
+    # 3,1
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    s=ttk.Style(master=None)
+    combo_leather = ttk.Combobox(master=iNumericInp_frame, values=['Yes','No'], state='readonly', width=in_ed['width']-3)
+    combo_leather.bind('<<ComboboxSelected>>', lambda x: UpdateNumericInput(combo_turbo.get(), combo_wheel.get(), combo_leather.get()))
+    s.configure('small.TButton', font=(None, 11))
+    combo_leather.grid(row=in_gd['row'], column=in_gd['column'])
+    combo_leather.current(0)
+
+    # 4,0
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    wheelPrompt_l = gf.GenFunc('label', in_ld, 'Wheel Side: ', in_gd)
+
+    # 4,1
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    #s=ttk.Style(master=None)
+    combo_wheel = ttk.Combobox(master=iNumericInp_frame, values=['Left','Right'], state='readonly', width=in_ed['width']-3)
+    #s.configure('small.TButton', font=(None, 11))
+    combo_wheel.bind('<<ComboboxSelected>>', lambda x: UpdateNumericInput(combo_turbo.get(), combo_wheel.get(), combo_leather.get()))
+    combo_wheel.grid(row=in_gd['row'], column=in_gd['column'], padx=10)
+    combo_wheel.current(0)
+    
+    # 5,0
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    back_b = gf.GenFunc('button', in_bd, 'Back', in_gd)
+    back_b.widg.config(command= lambda: iColor(frame=iNumericInp_frame))
+
+    # 5,1
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    go_b = gf.GenFunc('button', in_bd, 'Next', in_gd)
+
+    iNumericInp_frame.pack()
+    return
+iNumericalInput(frame=None)
 root.mainloop()

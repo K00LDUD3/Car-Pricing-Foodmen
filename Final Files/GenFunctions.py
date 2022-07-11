@@ -174,9 +174,7 @@ class GenFunc:
             relief= self.wd['relief'],
             highlightthickness= self.wd['highthick'],
             xscrollcommand= self.wd['xscrollcommand'],
-            style='small.TButton'
         )
-        s.configure('small.TButton', font=(None, self.FONT))
         self.widg.grid(
             column= self.gd['column'],
             row= self.gd['row'],
