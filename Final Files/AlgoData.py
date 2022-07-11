@@ -236,3 +236,13 @@ def CategValsUnique() -> dict:
         "color": color
     }
     return categ_dict
+
+#Segregating models based on category
+def SegModelsCateg():
+    categ_list = CategValsUnique().get('category')
+    df = pd.read_csv('TrainData_Raw.csv')[['Model', 'Category']]
+    categ_models = {}
+    
+    for i in categ_list:
+        categ_models[i] = list(set(list(df['Model'][df['Category'] == i])))
+    return categ_models
