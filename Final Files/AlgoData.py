@@ -2,7 +2,7 @@ from msilib.schema import CreateFolder
 import pandas as pd
 import numpy as np
 import pickle
-
+import joblib
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -171,8 +171,7 @@ def GetBINVal(val):
 def ArrangeInput(params):
     inp = [params['levy'],
            params['prod_year'],     
-           params['leather'], 
-           params['levy'],
+           params['leather'],
            params['engine_vol'],
            params['mileage'],
            params['cylinders'],
@@ -208,6 +207,11 @@ def ArrangeInput(params):
     final_data = pd.concat([numeric_data, categ_var_enc], axis=1)
 
     return final_data
+
+def Predict(data):
+    rf_model = joblib.load("D:\\School\\2.CS\\2. Grd 12\\Car-Pricing-Foodmen\\Models\\RF_final_1_1_0.obj")
+    y_pred = rf_model.predict(data)
+    return np.exp(y_pred)[0] * 79.52
 
 #Getting a unique model for each manufacturer
 def ManufactUniqueModels(choice = 'M') -> tuple:

@@ -852,13 +852,43 @@ def iNumericalInput_set2(frame):
     # 6,1
     in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', in_bd, 'Predict', in_gd)
-    
+    go_b.widg.config(command= lambda: Predict(frame=iNumericInpS2_frame))
+
     CheckAssignParams(None, None, None)
     iNumericInpS2_frame.pack()
     return
+
 def Predict(frame):
+    hideFrame(frame=frame)
     
+    param_dict = {
+        'levy': c_levy,
+        'prod_year': c_year,
+        'leather':c_leather,
+        'engine_vol':c_enginevol,
+        'mileage':c_mileage,
+        'cylinders':c_cylinders,
+        'airbags':c_airbags,
+        'turbo':c_turbo,
+        'left':0,
+        'right':0,
+
+        'manufacturer':c_manufacturer,
+        'model':c_model,
+        'category':c_category,
+        'fuel_type':c_fueltype,
+        'gear_box_type':c_gearbox,
+        'drive_wheels':c_drivewheels,
+        'color':c_color
+    }
+    if c_wheelSide == 'right':
+        param_dict['right'] = 1
+    else:
+        param_dict['left'] = 1
+    
+    data = alg.ArrangeInput(params=param_dict).head()
+    print(alg.Predict(data))
     
     return
-iNumericalInput_set2(frame=None)
+home(frame=None)
 root.mainloop()
