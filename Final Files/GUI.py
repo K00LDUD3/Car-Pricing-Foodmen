@@ -683,6 +683,7 @@ def iNumericalInput(frame):
     in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', in_bd, 'Next', in_gd)
 
+    UpdateNumericInput(combo_turbo.get(), combo_wheel.get(), combo_leather.get())
     iNumericInp_frame.pack()
     return
 iNumericalInput(frame=None)
