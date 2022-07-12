@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import ttk
 import tkinter
 import tkinter.font as font
-
+import numpy as np
 import GenFunctions as gf
 import AlgoData as alg
 
@@ -28,7 +28,8 @@ iDriveWheels_frame = LabelFrame(root)
 iColor_frame = LabelFrame(root)
 
 #NUMERICAL input frames
-iNumericInp_frame = LabelFrame(root)
+iNumericInpS1_frame = LabelFrame(root)
+iNumericInpS2_frame = LabelFrame(root)
 
 #CLASS VARIABLES required
 c_manufacturer = 'lexus' #First value is lexus
@@ -43,6 +44,12 @@ c_leather = 0
 c_turbo = 0
 c_year = 0
 c_wheelSide = ''
+
+c_enginevol = 0
+c_levy = 0
+c_cylinders = 0
+c_airbags = 0
+c_mileage = 0
 
 categorical_cols = alg.CategValsUnique() #CATEGORICAL options
 
@@ -124,6 +131,8 @@ gd = {
 def hideFrame(frame):
     try:
         frame.pack_forget()
+        for i in frame.winfo_children():
+            i.grid_forget()
         #print(f'Frame Hidden')
     except (TypeError, AttributeError):
         pass
@@ -556,7 +565,7 @@ def iColor(frame):
     #2,1
     ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', ic_bd, 'Next', ic_gd)
-    go_b.widg.config(command=lambda: iNumericalInput(frame=iColor_frame))
+    go_b.widg.config(command=lambda: iNumericalInput_set1(frame=iColor_frame))
 
     iColor_frame.pack()
     return
@@ -576,20 +585,20 @@ def UpdateNumericInput(turbo, wheel_side, leather):
         c_leather = 0
 
     c_wheelSide = wheel_side.lower()
-    print('UPDATE')
+    return
 #ALL FRAMES for taking CATEGORICAL input (Chronological)
-def iNumericalInput(frame):
+def iNumericalInput_set1(frame):
     '''
-    FRAME for taking all numerical inputs
+    FRAME for taking first set of numerical inputs
     '''
     hideFrame(frame=frame)
 
     in_bd = button_dict
     in_ld = label_dict
     in_ed = entry_dict
-    in_bd['master'] = iNumericInp_frame
-    in_ld['master'] = iNumericInp_frame
-    in_ed['master'] = iNumericInp_frame
+    in_bd['master'] = iNumericInpS1_frame
+    in_ld['master'] = iNumericInpS1_frame
+    in_ed['master'] = iNumericInpS1_frame
     in_gd = gd
 
     placements = [[0,0],
@@ -609,19 +618,23 @@ def iNumericalInput(frame):
     s=ttk.Style(master=None)
     s.theme_use('xpnative')
     def CheckYear(var, i, mode):
+        go_b.widg.config(state='disabled')
         val = string.get()
-        msg_l.widg.config(text='')
+        msg_l.widg.config(text='     ')
         if val.isnumeric() and '.' not in val:
             if int(val) in range(1950,2021):
                 global c_year
                 c_year = int(val)
                 msg_l.widg.config(text='Valid Year')
+                go_b.widg.config(state='enabled')
                 return
             else:
                 msg_l.widg.config(text='Out of range')
                 return
         elif val == '':
             msg_l.widg.config(text='Year must be 1950 - 2020')
+        else:
+            msg_l.widg.config(text='Enter a number!')
         return
     string = StringVar()
     string.trace_add('write', CheckYear)
@@ -642,7 +655,7 @@ def iNumericalInput(frame):
     # 2,1
     in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
     s=ttk.Style(master=None)
-    combo_turbo = ttk.Combobox(master=iNumericInp_frame, values=['Yes','No'], state='readonly', width=in_ed['width']-3)
+    combo_turbo = ttk.Combobox(master=iNumericInpS1_frame, values=['Yes','No'], state='readonly', width=in_ed['width']-3)
     combo_turbo.bind('<<ComboboxSelected>>', lambda x: UpdateNumericInput(combo_turbo.get(), combo_wheel.get(), combo_leather.get()))
     s.configure('small.TButton', font=(None, 11))
     combo_turbo.grid(row=in_gd['row'], column=in_gd['column'])
@@ -655,7 +668,7 @@ def iNumericalInput(frame):
     # 3,1
     in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
     s=ttk.Style(master=None)
-    combo_leather = ttk.Combobox(master=iNumericInp_frame, values=['Yes','No'], state='readonly', width=in_ed['width']-3)
+    combo_leather = ttk.Combobox(master=iNumericInpS1_frame, values=['Yes','No'], state='readonly', width=in_ed['width']-3)
     combo_leather.bind('<<ComboboxSelected>>', lambda x: UpdateNumericInput(combo_turbo.get(), combo_wheel.get(), combo_leather.get()))
     s.configure('small.TButton', font=(None, 11))
     combo_leather.grid(row=in_gd['row'], column=in_gd['column'])
@@ -668,7 +681,7 @@ def iNumericalInput(frame):
     # 4,1
     in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
     #s=ttk.Style(master=None)
-    combo_wheel = ttk.Combobox(master=iNumericInp_frame, values=['Left','Right'], state='readonly', width=in_ed['width']-3)
+    combo_wheel = ttk.Combobox(master=iNumericInpS1_frame, values=['Left','Right'], state='readonly', width=in_ed['width']-3)
     #s.configure('small.TButton', font=(None, 11))
     combo_wheel.bind('<<ComboboxSelected>>', lambda x: UpdateNumericInput(combo_turbo.get(), combo_wheel.get(), combo_leather.get()))
     combo_wheel.grid(row=in_gd['row'], column=in_gd['column'], padx=10)
@@ -677,14 +690,175 @@ def iNumericalInput(frame):
     # 5,0
     in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
     back_b = gf.GenFunc('button', in_bd, 'Back', in_gd)
-    back_b.widg.config(command= lambda: iColor(frame=iNumericInp_frame))
+    back_b.widg.config(command= lambda: iColor(frame=iNumericInpS1_frame))
 
     # 5,1
     in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', in_bd, 'Next', in_gd)
+    go_b.widg.config(command= lambda: iNumericalInput_set2(frame=iNumericInpS1_frame))
 
     UpdateNumericInput(combo_turbo.get(), combo_wheel.get(), combo_leather.get())
-    iNumericInp_frame.pack()
+    iNumericInpS1_frame.pack()
     return
-iNumericalInput(frame=None)
+
+def iNumericalInput_set2(frame):
+    '''
+    FRAME for taking first set of numerical inputs
+    '''
+    hideFrame(frame=frame)
+    
+    in_bd = button_dict
+    in_ld = label_dict
+    in_ed = entry_dict
+    in_bd['master'] = iNumericInpS2_frame
+    in_ld['master'] = iNumericInpS2_frame
+    in_ed['master'] = iNumericInpS2_frame
+    in_ed['width'] = 10
+    in_gd = gd
+
+    placements = [[0,0],
+                  [0,0],
+                  [0,0],
+                  [0,0],
+                  [0,0],
+                  [0,0],
+                  [0,0]]
+    #Internal function for checking and assigning parameters in realtime
+    def CheckAssignParams(var, i, mode):
+        #Disabling button 
+        go_b.widg.config(state='disabled')
+
+        #Removing negative symbols
+        s_engVol.set(s_engVol.get().strip('-'))
+        s_levy.set(s_levy.get().strip('-'))
+        s_airbags.set(s_airbags.get().strip('-'))
+        s_mileage.set(s_mileage.get().strip('-'))
+
+        #Fetching values
+        eng_vol = s_engVol.get()
+        levy = s_levy.get()
+        airbags = s_airbags.get()
+        mileage = s_mileage.get()
+        global c_enginevol, c_levy, c_cylinders, c_airbags, c_mileage
+        c_cylinders = int(combo.get())
+
+        # Nested func to check whether int, float or invalid
+        def CheckNumeric(val, choice = 'int'):
+            try:
+                float(val)
+            except ValueError:
+                return False
+            if choice == 'number':
+                return True
+            elif '.' not in val and choice == 'int':
+                return True
+            else:
+                return False
+
+        if CheckNumeric(eng_vol, 'number'):
+            if float(eng_vol) > 0:
+                c_enginevol = float(eng_vol)
+                print('engine volume valid')
+        else:
+            msg_l.widg.config(text='Enter a valid number (Engine Volume)!')
+            return
+        if CheckNumeric(levy, 'number'):
+            if float(levy) >= 0:
+                c_levy = float(levy) * 0.013 #Converting to dollars
+        else:
+            msg_l.widg.config(text='Enter a valid number (Levy)!')
+            return
+        if CheckNumeric(airbags, 'int'):
+            if int(airbags) >= 0:
+                c_airbags = int(airbags)
+        else:
+            msg_l.widg.config(text='Enter an integer (airbags)!')
+            return
+        if CheckNumeric(mileage, 'number'):
+            if float(mileage) > 0:
+                c_mileage = float(mileage) * 0.621371 #Kms to miles
+        else:
+            msg_l.widg.config(text='Enter a valid number (mileage)!')
+            return
+        msg_l.widg.config(text='Valid ')
+        go_b.widg.config(state='enabled')
+        return 
+
+
+    # 0,0
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    engVolPrompt_l = gf.GenFunc('label', in_ld, 'Engine Volume (cc): ', in_gd)
+    # 0,1
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    s_engVol = StringVar()
+    s_engVol.trace_add('write', CheckAssignParams)
+    engVol_e = gf.GenFunc('entry', in_ed, '', in_gd)
+    engVol_e.widg.config(textvariable=s_engVol)
+
+    # 1,0
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    levyPrompt_l = gf.GenFunc('label', in_ld, 'Levy (₹): ', in_gd)
+    # 1,1
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    s_levy = StringVar()
+    s_levy.trace_add('write', CheckAssignParams)
+    levy_e = gf.GenFunc('entry', in_ed, s_levy, in_gd)
+
+    # 2,0
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    cylindersPrompt_l = gf.GenFunc('label', in_ld, 'Cylinders: ', in_gd)
+    # 2,1
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    cylinders = [i for i in range(1,17)]
+    s=ttk.Style(master=None)
+    combo = ttk.Combobox(master=iNumericInpS2_frame, values=cylinders, state='readonly', width=in_ed['width']-3)
+    combo.bind('<<ComboboxSelected>>', lambda x: CheckAssignParams(None, None, None))
+    s.configure('small.TButton', font=(None, 11))
+    combo.grid(row=in_gd['row'], column=in_gd['column'])
+    combo.current(0)
+
+
+    # 3,0
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    airbagsPrompt_l = gf.GenFunc('label', in_ld, 'Airbags: ', in_gd)
+    # 3,1
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    s_airbags = StringVar()
+    s_airbags.trace_add('write', CheckAssignParams)
+    airbags_e = gf.GenFunc('entry', in_ed, s_airbags, in_gd)
+
+    # 4,0
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    mileagePrompt_l = gf.GenFunc('label', in_ld, 'Mileage (Km): ', in_gd)
+    # 4,1
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    s_mileage = StringVar()
+    s_mileage.trace_add('write', CheckAssignParams)
+    mileage_e = gf.GenFunc('entry', in_ed, s_mileage, in_gd)
+
+    # 5,0
+    # 5,1
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    in_gd['cspan'] = 2
+    msg_l = gf.GenFunc('label', in_ld, 'OUTPUT', in_gd)
+    in_gd['cspan'] = 1
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+
+    # 6,0
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    back_b = gf.GenFunc('button', in_bd, 'Back', in_gd)
+    back_b.widg.config(command= lambda: iNumericalInput_set1(frame=iNumericInpS2_frame))
+    
+    # 6,1
+    in_gd['row'], in_gd['column'], placements = GetFreeCoor(placements)
+    go_b = gf.GenFunc('button', in_bd, 'Predict', in_gd)
+    
+    CheckAssignParams(None, None, None)
+    iNumericInpS2_frame.pack()
+    return
+def Predict(frame):
+    
+    
+    return
+iNumericalInput_set2(frame=None)
 root.mainloop()
