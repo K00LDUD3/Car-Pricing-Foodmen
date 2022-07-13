@@ -31,6 +31,9 @@ iColor_frame = LabelFrame(root)
 iNumericInpS1_frame = LabelFrame(root)
 iNumericInpS2_frame = LabelFrame(root)
 
+#OUTPUT frame
+op_frame = LabelFrame(root)
+
 #CLASS VARIABLES required
 c_manufacturer = 'lexus' #First value is lexus
 c_model = '' 
@@ -133,7 +136,6 @@ def hideFrame(frame):
         frame.pack_forget()
         for i in frame.winfo_children():
             i.grid_forget()
-        #print(f'Frame Hidden')
     except (TypeError, AttributeError):
         pass
     finally:
@@ -729,10 +731,10 @@ def iNumericalInput_set2(frame):
         go_b.widg.config(state='disabled')
 
         #Removing negative symbols
-        s_engVol.set(s_engVol.get().strip('-'))
-        s_levy.set(s_levy.get().strip('-'))
-        s_airbags.set(s_airbags.get().strip('-'))
-        s_mileage.set(s_mileage.get().strip('-'))
+        s_engVol.set(s_engVol.get().strip('-').replace(',', ''))
+        s_levy.set(s_levy.get().strip('-').replace(',',''))
+        s_airbags.set(s_airbags.get().strip('-').replace(',',''))
+        s_mileage.set(s_mileage.get().strip('-').replace(',',''))
 
         #Fetching values
         eng_vol = s_engVol.get()
@@ -758,7 +760,6 @@ def iNumericalInput_set2(frame):
         if CheckNumeric(eng_vol, 'number'):
             if float(eng_vol) > 0:
                 c_enginevol = float(eng_vol)
-                print('engine volume valid')
         else:
             msg_l.widg.config(text='Enter a valid number (Engine Volume)!')
             return
@@ -859,8 +860,36 @@ def iNumericalInput_set2(frame):
     return
 
 def Predict(frame):
+    '''
+    FRAME for calculating and displaying OUTPUT, storing HISTORY too
+    '''
     hideFrame(frame=frame)
     
+    ip_bd = button_dict
+    ip_ld = label_dict
+    ip_bd['master'] = op_frame
+    ip_ld['master'] = op_frame
+    ip_gd = gd
+
+    placements = [[0],
+                  [0],
+                  [0]]
+
+    #0
+    ip_gd['row'], ip_gd['column'], placements = GetFreeCoor(placements)
+    prompt_l = gf.GenFunc('label', ip_ld, 'Price (₹)', ip_gd)
+
+    #1
+    ip_gd['row'], ip_gd['column'], placements = GetFreeCoor(placements)
+    op_l = gf.GenFunc('label', ip_ld, 'Please Wait...', ip_gd)
+
+    #2
+    ip_gd['row'], ip_gd['column'], placements = GetFreeCoor(placements)
+    go_b = gf.GenFunc('button', ip_bd, 'OK', ip_gd)
+    go_b.widg.config(command= lambda: home(frame=op_frame), state='disabled')
+
+    op_frame.pack()
+
     param_dict = {
         'levy': c_levy,
         'prod_year': c_year,
@@ -887,8 +916,10 @@ def Predict(frame):
         param_dict['left'] = 1
     
     data = alg.ArrangeInput(params=param_dict).head()
-    print(alg.Predict(data))
-    
+    result = f'{alg.Predict(data):.2f}'
+    op_l.widg.config(text= result)
+    go_b.widg.config(state='enabled')
+
     return
 home(frame=None)
 root.mainloop()
