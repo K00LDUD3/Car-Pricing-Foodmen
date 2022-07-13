@@ -12,7 +12,7 @@ root = Tk()
 root.title('Used Car Pricing')
 
 #FRAMES
-sign_frame = LabelFrame(root)
+signChoose_frame = LabelFrame(root)
 signIn_frame = LabelFrame(root)
 signUp_frame = LabelFrame(root)
 
@@ -55,6 +55,8 @@ c_airbags = 0
 c_mileage = 0
 
 categorical_cols = alg.CategValsUnique() #CATEGORICAL options
+
+current_user = None
 
 #WIDGET DICTIONARIES (GLOBAL to access anytime)
 #Button features
@@ -151,6 +153,158 @@ def GetFreeCoor(arr):
                 return (i, j, arr)
     return (None, None, arr)
 
+def SignChoose(frame):
+    '''
+    Sign In/Up FRAME
+    '''
+    hideFrame(frame=frame)
+
+    s_gd = gd
+    s_bd = button_dict
+    s_gd['ipady'] = 5
+    s_bd['master'] = signChoose_frame
+    s_bd['w'] = 25
+
+    placements = [[0], [0], [0]]
+
+    # 0
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    signIn_b = gf.GenFunc('button', s_bd, 'Sign In', s_gd)
+    signIn_b.widg.config(command= lambda: SignIn(frame=signChoose_frame))
+
+    # 1
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    signUp_b = gf.GenFunc('button', s_bd, 'Sign Up', s_gd)
+    signUp_b.widg.config(command= lambda: SignUp(frame=signChoose_frame))
+
+    # 2
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    guest_b = gf.GenFunc('button', s_bd, 'Continue As Guest', s_gd)
+    guest_b.widg.config(command= lambda: home(frame=signChoose_frame))
+
+    # 3
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    exit_b = gf.GenFunc('button', s_bd, 'Exit', s_gd)
+    exit_b.widg.config(command= lambda: root.destroy())
+
+    signChoose_frame.pack()
+    global current_user
+    current_user = None
+    return
+
+def SignIn(frame):
+    '''
+    Sign In FRAME
+    '''
+    hideFrame(frame=frame)
+
+    s_gd = gd
+    s_bd = button_dict
+    s_ld = label_dict
+    s_ed = entry_dict
+    s_gd['ipady'] = 5
+    s_bd['master'] = signIn_frame
+    s_ld['master'] = signIn_frame
+    s_ed['master'] = signIn_frame
+    # s_bd['w'] = 20
+
+    placements = [[0,0],[0,0],[0,0],[0,0]]
+
+    # 0,0
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    userPrompt_l = gf.GenFunc('label', s_ld, 'Username: ', s_gd)
+
+    # 0,1
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    user_e = gf.GenFunc('entry', s_ed, StringVar(), s_gd)
+
+    # 1,0
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    passPrompt_l = gf.GenFunc('label', s_ld, 'Password: ', s_gd)
+    
+    # 1,1
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    pass_e = gf.GenFunc('entry', s_ed, StringVar(), s_gd)
+
+    # 2,0
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    s_gd['cspan'] = 2
+    msg_l = gf.GenFunc('label', s_ld, 'Enter Credentials', s_gd)
+    s_gd['cspan'] = 1
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+
+    # 3,0
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    back_b = gf.GenFunc('button', s_bd, 'back', s_gd)
+    back_b.widg.config(command= lambda: SignChoose(frame=signIn_frame))
+
+    # 3,1
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    go_b = gf.GenFunc('button', s_bd, 'Sign In', s_gd)
+
+    signIn_frame.pack()
+    return
+
+def SignUp(frame):
+    '''
+    Sign Up FRAME
+    '''
+    hideFrame(frame=frame)
+
+    s_gd = gd
+    s_bd = button_dict
+    s_ld = label_dict
+    s_ed = entry_dict
+    s_gd['ipady'] = 5
+    s_bd['master'] = signUp_frame
+    s_ld['master'] = signUp_frame
+    s_ed['master'] = signUp_frame
+    # s_bd['w'] = 20
+
+    placements = [[0,0],[0,0],[0,0],[0,0],[0,0]]
+
+    # 0,0
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    userPrompt_l = gf.GenFunc('label', s_ld, 'Username: ', s_gd)
+
+    # 0,1
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    user_e = gf.GenFunc('entry', s_ed, StringVar(), s_gd)
+
+    # 1,0
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    passPrompt_l = gf.GenFunc('label', s_ld, 'Password: ', s_gd)
+    
+    # 1,1
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    pass_e = gf.GenFunc('entry', s_ed, StringVar(), s_gd)
+
+    # 2,0
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    confpassprompt_l = gf.GenFunc('label', s_ld, 'Confirm Password: ', s_gd)
+    
+    # 2,1
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    confpass_e = gf.GenFunc('entry', s_ed, StringVar(), s_gd)
+
+    # 3,0
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    s_gd['cspan'] = 2
+    msg_l = gf.GenFunc('label', s_ld, 'Enter Credentials', s_gd)
+    s_gd['cspan'] = 1
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+
+    # 4,0
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    back_b = gf.GenFunc('button', s_bd, 'Back', s_gd)
+    back_b.widg.config(command= lambda: SignChoose(frame=signUp_frame))
+    
+    # 4,1
+    s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
+    go_b = gf.GenFunc('button', s_bd, 'Sign In', s_gd)
+
+    signUp_frame.pack()
+    return
 
 def home(frame):
     '''
@@ -171,11 +325,14 @@ def home(frame):
     start_b.widg.config(command= lambda: iManufacturer(frame=home_frame))
 
     h_gd['row'], h_gd['column'], placements = GetFreeCoor(placements)
-    back_b = gf.GenFunc('button', h_bd, 'Sign Out', h_gd)
+    disp = 'Sign Out'
+    if current_user == None:
+        disp = 'Back'
+    back_b = gf.GenFunc('button', h_bd, disp, h_gd)
+    back_b.widg.config(command= lambda: SignChoose(frame=home_frame))
 
     home_frame.pack()
     return
-
 
 def UpdateManufacturer(choice):
     global c_manufacturer
@@ -218,17 +375,10 @@ def iManufacturer(frame):
 
     #1,0
     im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
-    im_gd['cspan'] = 2
-    msg_l = gf.GenFunc('label', im_ld, 'OUTPUT', im_gd)
-    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
-    im_gd['cspan'] = 1
-
-    #2,0
-    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
     cancel_b =  gf.GenFunc('button', im_bd, 'Cancel', im_gd)
-    cancel_b.widg.config(command= lambda: home(frame=iManufacturer))
+    cancel_b.widg.config(command= lambda: home(frame=iManufacturer_frame))
     
-    #2,1
+    #1,1
     im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', im_bd, 'Next', im_gd)
     go_b.widg.config(command= lambda: iModel(frame=iManufacturer_frame))
@@ -279,17 +429,10 @@ def iModel(frame):
     
     #1,0
     im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
-    im_gd['cspan'] = 2
-    msg_l = gf.GenFunc('label', im_ld, 'OUTPUT', im_gd)
-    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
-    im_gd['cspan'] = 1
-    
-    #2,0
-    im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
     back_b =  gf.GenFunc('button', im_bd, 'Back', im_gd)
     back_b.widg.config(command=lambda: iManufacturer(frame=iModel_frame))
     
-    #2,1
+    #1,1
     im_gd['row'], im_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', im_bd, 'Next', im_gd)
     go_b.widg.config(command= lambda: iCategory(frame=iModel_frame))
@@ -332,17 +475,10 @@ def iCategory(frame):
 
     #1,0
     ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
-    ic_gd['cspan'] = 2
-    msg_l = gf.GenFunc('label', ic_ld, 'OUTPUT', ic_gd)
-    ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
-    ic_gd['cspan'] = 1
-
-    #2,0
-    ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
     back_b = gf.GenFunc('button', ic_bd, 'Back', ic_gd)
     back_b.widg.config(command=lambda: iModel(frame=iCategory_frame))
 
-    #2,1
+    #1,1
     ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', ic_bd, 'Next', ic_gd)
     go_b.widg.config(command=lambda: iFuelType(frame=iCategory_frame))
@@ -388,17 +524,10 @@ def iFuelType(frame):
 
     #1,0
     if_gd['row'], if_gd['column'], placements = GetFreeCoor(placements)
-    if_gd['cspan'] = 2
-    msg_l = gf.GenFunc('label', if_ld, 'OUTPUT', if_gd)
-    if_gd['row'], if_gd['column'], placements = GetFreeCoor(placements)
-    if_gd['cspan'] = 1
-
-    #2,0
-    if_gd['row'], if_gd['column'], placements = GetFreeCoor(placements)
     back_b =  gf.GenFunc('button', if_bd, 'Back', if_gd)
     back_b.widg.config(command= lambda: iModel(frame=iFuelType_frame))
 
-    #2,1
+    #1,1
     if_gd['row'], if_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', if_bd, 'Next', if_gd)
     go_b.widg.config(command= lambda: iGearBox(frame=iFuelType_frame))
@@ -444,16 +573,10 @@ def iGearBox(frame):
 
     #1,0
     igb_gd['row'], igb_gd['column'], placements = GetFreeCoor(placements)
-    igb_gd['cspan'] = 2
-    msg_l = gf.GenFunc('label', igb_ld, 'OUTPUT', igb_gd)
-    igb_gd['row'], igb_gd['column'], placements = GetFreeCoor(placements)
-    igb_gd['cspan'] = 1
-
-    #2,0
-    igb_gd['row'], igb_gd['column'], placements = GetFreeCoor(placements)
     back_b = gf.GenFunc('button', igb_bd, 'Back', igb_gd)
     back_b.widg.config(command= lambda: iFuelType(frame=iGearBox_frame))
-    #2,1
+    
+    #1,1
     igb_gd['row'], igb_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', igb_bd, 'Next', igb_gd)
     go_b.widg.config(command= lambda: iDriveWheels(frame=iGearBox_frame))
@@ -497,17 +620,10 @@ def iDriveWheels(frame):
 
     #1,0
     id_gd['row'], id_gd['column'], placements = GetFreeCoor(placements)
-    id_gd['cspan'] = 2
-    msg_l = gf.GenFunc('label', id_ld, 'OUTPUT', id_gd)
-    id_gd['row'], id_gd['column'], placements = GetFreeCoor(placements)
-    id_gd['cspan'] = 1
-
-    #2,0
-    id_gd['row'], id_gd['column'], placements = GetFreeCoor(placements)
     back_b = gf.GenFunc('button', id_bd, 'Back', id_gd)
     back_b.widg.config(command= lambda: iGearBox(frame=iDriveWheels_frame))
 
-    #2,1
+    #1,1
     id_gd['row'], id_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', id_bd, 'Next', id_gd)
     go_b.widg.config(command= lambda: iColor(frame=iDriveWheels_frame))
@@ -554,17 +670,10 @@ def iColor(frame):
 
     #1,0
     ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
-    ic_gd['cspan'] = 2
-    msg_l = gf.GenFunc('label', ic_ld, 'OUTPUT', ic_gd)
-    ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
-    ic_gd['cspan'] = 1
-
-    #2,0
-    ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
     back_b = gf.GenFunc('button', ic_bd, 'Back', ic_gd)
     back_b.widg.config(command=lambda: iDriveWheels(frame=iColor_frame))
 
-    #2,1
+    #1,1
     ic_gd['row'], ic_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', ic_bd, 'Next', ic_gd)
     go_b.widg.config(command=lambda: iNumericalInput_set1(frame=iColor_frame))
@@ -701,6 +810,8 @@ def iNumericalInput_set1(frame):
 
     UpdateNumericInput(combo_turbo.get(), combo_wheel.get(), combo_leather.get())
     iNumericInpS1_frame.pack()
+    CheckYear(None, None, None)
+
     return
 
 def iNumericalInput_set2(frame):
@@ -921,5 +1032,5 @@ def Predict(frame):
     go_b.widg.config(state='enabled')
 
     return
-home(frame=None)
+SignChoose(frame=None)
 root.mainloop()
