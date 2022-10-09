@@ -1,4 +1,6 @@
-from msilib.schema import CreateFolder
+'''
+Module for dealing with data
+'''
 import pandas as pd
 import numpy as np
 import pickle
@@ -28,18 +30,18 @@ def ReadTrainData(filename, raw=False, encode = True) -> pd.DataFrame:
     df['Gear box type'] = df['Gear box type'].apply(lambda x: x.lower())
     df['Wheel'] = df['Wheel'].apply(lambda x: x.lower())
     df['Color'] = df['Color'].apply(lambda x: x.lower())
-    df['Color'] = df['Color'].apply(lambda x: x.lower())
 
 
-    #WHEEL cleaning up wheel column to make it say either left wheel or right wheel
+    #WHEEL cleaning up wheel column to make it say either left wheel or right wheel eg: left-wheel, left, -
     def SplitWheel(n):
+        '''extracts either LEFT or RIGHT'''
         n = str(n)
         return ''+n.split(' ')[0].split('-')[0]+' wheel'
     df['Wheel'] = df['Wheel'].apply(lambda x: SplitWheel(x))
     wheel_dummies = pd.get_dummies(df['Wheel'], drop_first = False)
     df = pd.concat([df, wheel_dummies], axis=1)
     
-    ##MANUFACTURER redundancies
+    #MANUFACTURER redundancies
     manuf_count = pd.DataFrame(df.Manufacturer.value_counts())
     manuf_count = manuf_count[manuf_count['Manufacturer'].isin([i for i in range(0,10)])]
     df = df[~df['Manufacturer'].isin(manuf_count.index)]
@@ -76,8 +78,6 @@ def ReadTrainData(filename, raw=False, encode = True) -> pd.DataFrame:
     if raw:
         return df
 
-    #Removing INDEX column
-    #df.drop('index', inplace=True, axis=1)
 
     ##LEATHER INTERIOR replacing yes or no with 1 and 0
     def YNReplace(n):

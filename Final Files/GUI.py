@@ -1,4 +1,5 @@
 from ctypes.wintypes import HGDIOBJ
+from re import I
 from tkinter import *
 from tkinter import ttk
 import tkinter
@@ -6,6 +7,9 @@ import tkinter.font as font
 import numpy as np
 import GenFunctions as gf
 import AlgoData as alg
+import mysql.connector
+
+mydb = mysql.connector.connect(host="sql6.freesqldatabase.com", user="sql6524697", password="RHmy8YbEy4", database="sql6524697")
 
 #Creating window
 root = Tk()
@@ -158,7 +162,7 @@ def SignChoose(frame):
     Sign In/Up FRAME
     '''
     hideFrame(frame=frame)
-
+    
     s_gd = gd
     s_bd = button_dict
     s_gd['ipady'] = 5
@@ -188,7 +192,7 @@ def SignChoose(frame):
     exit_b.widg.config(command= lambda: root.destroy())
 
     signChoose_frame.pack()
-    global current_user
+    
     current_user = None
     return
 
@@ -241,7 +245,7 @@ def SignIn(frame):
     # 3,1
     s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', s_bd, 'Sign In', s_gd)
-
+    go_b.widg.config(command=lambda: CredVer(user_e.widg.get(), pass_e.widg.get(), msg_l))
     signIn_frame.pack()
     return
 
@@ -302,7 +306,7 @@ def SignUp(frame):
     # 4,1
     s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
     go_b = gf.GenFunc('button', s_bd, 'Sign In', s_gd)
-
+    go_b.widg.config(command=lambda: SignUpConf(user_e.widg.get(), pass_e.widg.get(), confpass_e.widg.get(), msg_l))
     signUp_frame.pack()
     return
 
@@ -1025,12 +1029,78 @@ def Predict(frame):
         param_dict['right'] = 1
     else:
         param_dict['left'] = 1
-    
     data = alg.ArrangeInput(params=param_dict).head()
     result = f'{alg.Predict(data):.2f}'
     op_l.widg.config(text= result)
+
+    if current_user != None:
+        RecordEntry(param_dict)
+
     go_b.widg.config(state='enabled')
 
+
+    return
+
+#Record Entry (history)
+
+def RecordEntry(p):
+    mycursor = mydb.cursor( )
+    global current_user
+    query = "INSERT INTO records values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    # records = [(p['levy'], p['prod_year'], p['leather'], p['engine_vol'], p[])]
+    records = [current_user]
+    records.extend(p[i] for i in p.keys())
+    records = [tuple(records)]
+    mycursor.executemany(query,records)
+    mydb.commit( )    
+    
+
+#User Verify for Signing up
+def SignUpConf(user, password, conf_password, lab_obj):
+    query = "INSERT INTO accounts values(%s,%s)"
+    mycursor = mydb.cursor( )
+    if(password == conf_password):
+        acc = [(user,password)]
+        try:
+            mycursor.executemany(query,acc)
+            mydb.commit( )
+        except:
+            lab_obj.widg.config(text='Username Already Exists!')
+            return
+        lab_obj.widg.config(text='Account Created')
+        return
+    lab_obj.widg.config(text='Passwords dont match')
+    return
+
+#Credentials verification for sign in
+def CredVer(user, password, lab_obj):
+
+    mycursorU = mydb.cursor( )
+    mycursorP = mydb.cursor( )
+    mycursorU.execute(f"select Username from accounts where Username='{user}'")
+    log = False
+    users = mycursorU.fetchall( ) #list 
+    #print(users)
+    if(users==[]):
+        # account doesnt exist
+        log = False
+    else:
+        mycursorP.execute(f"select Password from accounts where Username='{user}'")
+        passwor = (mycursorP.fetchall( ))[0][0]
+        #print(passwor)
+        if(passwor==password):
+            log = True
+    
+    if(log==True):
+        users = users[0][0]
+        #successful
+        global current_user
+        current_user = user
+        print(f'{current_user=}')
+        home(frame=signIn_frame)
+        return
+    # acc doesnt exist 
+    lab_obj.widg.config(text='Invalid Credentials!')
     return
 SignChoose(frame=None)
 root.mainloop()
