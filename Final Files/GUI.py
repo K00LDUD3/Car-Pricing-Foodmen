@@ -15,12 +15,17 @@ mydb = mysql.connector.connect(host="sql6.freesqldatabase.com", user="sql6524697
 root = Tk()
 root.title('Used Car Pricing')
 
+#MISC
+pass_dot = '\u2022'
+
 #FRAMES
 signChoose_frame = LabelFrame(root)
 signIn_frame = LabelFrame(root)
 signUp_frame = LabelFrame(root)
 
 home_frame = LabelFrame(root)
+
+hist_frame = LabelFrame(root)
 
 #CATEGORICAL input frames
 iManufacturer_frame = LabelFrame(root)
@@ -161,6 +166,7 @@ def SignChoose(frame):
     '''
     Sign In/Up FRAME
     '''
+    #Hiding previous frame to avoid colisions
     hideFrame(frame=frame)
     
     s_gd = gd
@@ -200,6 +206,7 @@ def SignIn(frame):
     '''
     Sign In FRAME
     '''
+    #Hiding previous frame to avoid colisions
     hideFrame(frame=frame)
 
     s_gd = gd
@@ -229,7 +236,8 @@ def SignIn(frame):
     # 1,1
     s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
     pass_e = gf.GenFunc('entry', s_ed, StringVar(), s_gd)
-
+    pass_e.widg.config(show=pass_dot)
+    
     # 2,0
     s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
     s_gd['cspan'] = 2
@@ -253,6 +261,7 @@ def SignUp(frame):
     '''
     Sign Up FRAME
     '''
+    #Hiding previous frame to avoid colisions
     hideFrame(frame=frame)
 
     s_gd = gd
@@ -282,6 +291,7 @@ def SignUp(frame):
     # 1,1
     s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
     pass_e = gf.GenFunc('entry', s_ed, StringVar(), s_gd)
+    pass_e.widg.config(show=pass_dot)
 
     # 2,0
     s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
@@ -290,6 +300,7 @@ def SignUp(frame):
     # 2,1
     s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
     confpass_e = gf.GenFunc('entry', s_ed, StringVar(), s_gd)
+    confpass_e.widg.config(show=pass_dot)
 
     # 3,0
     s_gd['row'], s_gd['column'], placements = GetFreeCoor(placements)
@@ -314,6 +325,7 @@ def home(frame):
     '''
     Homescreen to display available options(sign out, start pricing)
     '''
+    #Hiding previous frame to avoid colisions
     hideFrame(frame=frame)
     h_gd = gd
     h_bd = button_dict
@@ -322,6 +334,7 @@ def home(frame):
     h_bd['w'] = 20
     
     placements = [[0],
+                  [0],
                   [0]]
 
     h_gd['row'], h_gd['column'], placements = GetFreeCoor(placements)
@@ -335,9 +348,35 @@ def home(frame):
     back_b = gf.GenFunc('button', h_bd, disp, h_gd)
     back_b.widg.config(command= lambda: SignChoose(frame=home_frame))
 
+    h_gd['row'], h_gd['column'], placements = GetFreeCoor(placements)
+    history_b = gf.GenFunc('button', h_bd, 'History', h_gd)
+    if current_user == None:
+        history_b.widg.config(state = 'disabled')
+    else:
+        history_b.widg.config(state = 'active')
+    history_b.widg.config(command=lambda: History(frame=home_frame))
     home_frame.pack()
     return
 
+#History retrieving for user to see
+def History(frame):
+    #Hiding previous frame to avoid colisions
+    hideFrame(frame=frame)
+    h_gd = gd
+    h_bd = button_dict
+    h_ld = label_dict
+    h_ld['master'] = hist_frame
+    h_gd['ipady'] = 5
+    h_bd['master'] = hist_frame
+    h_bd['w'] = 20
+
+    back_b = gf.GenFunc('button', h_bd, 'Back', h_gd)
+    back_b.widg.config(command= lambda: home(frame=hist_frame))
+    
+    hist_frame.pack()
+    return
+
+#
 def UpdateManufacturer(choice):
     global c_manufacturer
     choice = choice.strip().split(' ')[1]
@@ -349,6 +388,7 @@ def iManufacturer(frame):
     '''
     FRAME for taking manufacturer as input
     '''
+    #Hiding previous frame to avoid colisions
     hideFrame(frame=frame)
 
     im_bd = button_dict
@@ -400,6 +440,7 @@ def iModel(frame):
     '''
     FRAME for taking model as input
     '''
+    #Hiding previous frame to avoid colisions
     hideFrame(frame=frame)
 
     im_bd = button_dict
@@ -449,6 +490,7 @@ def iCategory(frame):
     '''
     FRAME for taking category as input
     '''
+    #Hiding previous frame to avoid colisions
     hideFrame(frame=frame)
 
     ic_bd = button_dict
@@ -499,6 +541,7 @@ def iFuelType(frame):
     '''
     FRAME for taking fuel type as input
     '''
+    #Hiding previous frame to avoid colisions
     hideFrame(frame=frame)
 
     if_bd = button_dict
@@ -547,6 +590,7 @@ def iGearBox(frame):
     '''
     FRAME for taking gear box type as input
     '''
+    #Hiding previous frame to avoid colisions
     hideFrame(frame=frame)
 
     igb_bd = button_dict
@@ -595,6 +639,7 @@ def iDriveWheels(frame):
     '''
     FRAME for taking drive wheels as input
     '''
+    #Hiding previous frame to avoid colisions
     hideFrame(frame=frame)
 
     id_bd = button_dict
@@ -644,6 +689,7 @@ def iColor(frame):
     '''
     FRAME for taking color as input
     '''
+    #Hiding previous frame to avoid colisions
     hideFrame(frame=frame)
 
     ic_bd = button_dict
@@ -706,6 +752,7 @@ def iNumericalInput_set1(frame):
     '''
     FRAME for taking first set of numerical inputs
     '''
+    #Hiding previous frame to avoid colisions
     hideFrame(frame=frame)
 
     in_bd = button_dict
@@ -822,6 +869,7 @@ def iNumericalInput_set2(frame):
     '''
     FRAME for taking first set of numerical inputs
     '''
+    #Hiding previous frame to avoid colisions
     hideFrame(frame=frame)
     
     in_bd = button_dict
@@ -978,6 +1026,7 @@ def Predict(frame):
     '''
     FRAME for calculating and displaying OUTPUT, storing HISTORY too
     '''
+    #Hiding previous frame to avoid colisions
     hideFrame(frame=frame)
     
     ip_bd = button_dict
