@@ -366,14 +366,77 @@ def History(frame):
     h_bd = button_dict
     h_ld = label_dict
     h_ld['master'] = hist_frame
-    h_gd['ipady'] = 5
+    h_gd['ipady'] = 0
     h_bd['master'] = hist_frame
-    h_bd['w'] = 20
+    h_bd['w'] = 8
+    
+    global current_user
 
+    def GetHistory():
+        
+        mycursor = mydb.cursor( )
+        query = f"Select * from records where Username='{current_user}'"
+        mycursor.execute(query)
+        myres = mycursor.fetchall( )
+
+        l = len(myres)
+        n = 3
+        li = [("Username",
+        "Levy",
+        "Product Year",
+        "Leather Interior",
+        "Engine Volume",
+        "Mileage",
+        "Cylinders",
+        "Airbags",
+        "Turbo",
+        "Wheel Side",
+        "Manufacturer",
+        "Model",
+        "Category",
+        "Fuel Type",
+        "Gear Box Type",
+        "Drive Wheels",
+        "Color")]
+        try:
+            for i in range(l-1,(l-n)-1,-1):
+                temp1 = myres[i]
+                temp = list(temp1)
+                val = 'right'
+                if temp[9] == 1:
+                    val = 'left'
+                del temp[10]
+                temp[9] = val
+                if temp[3] == 1:
+                    temp[3] = "Yes"
+                else:
+                    temp[3] = "No"
+                if temp[8] == 1:
+                    temp[8] = "Yes"
+                else:
+                    temp[8] = "No"
+                li.append(temp)     
+                
+            mydb.commit( )    
+        except:
+            pass
+
+        
+        return li
+    h = GetHistory()
+
+    print(h)
+    print(len(h), len(h[0]))
+    for i in range(len(h)):
+        for j in range(len(h[0])-1):
+            h_gd['row'], h_gd['column'] = i,j+1
+            temp = gf.GenFunc('label', h_ld, h[i][j+1], h_gd)
+    h_gd['row'], h_gd['column'] = len(h) + 1, 16
     back_b = gf.GenFunc('button', h_bd, 'Back', h_gd)
     back_b.widg.config(command= lambda: home(frame=hist_frame))
     
     hist_frame.pack()
+
     return
 
 #
